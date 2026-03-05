@@ -7,13 +7,12 @@ local ts=game:GetService("TeleportService")
 local hs=game:GetService("HttpService")
 local tween=game:GetService("TweenService")
 
--- 全部最初はOFF
+-- フラグ（Aimbot削除）
 local f=false
 local n=false
 local e=false
 local fl=false
 local g=false
-local a=false
 local m=false
 
 local s=50
@@ -32,8 +31,8 @@ gui.Enabled=false
 gui.Parent=p.PlayerGui
 
 local bgFrame=Instance.new("Frame")
-bgFrame.Size=UDim2.new(0,350,0,400)
-bgFrame.Position=UDim2.new(0.5,-175,0.5,-200)
+bgFrame.Size=UDim2.new(0,350,0,350)
+bgFrame.Position=UDim2.new(0.5,-175,0.5,-175)
 bgFrame.BackgroundColor3=Color3.fromRGB(15,15,15)
 bgFrame.BackgroundTransparency=0.1
 bgFrame.BorderSizePixel=0
@@ -74,18 +73,18 @@ grid.BackgroundTransparency=1
 grid.Parent=bgFrame
 
 local layout=Instance.new("UIGridLayout")
-layout.CellSize=UDim2.new(0,95,0,70)
-layout.CellPadding=UDim2.new(0,8,0,8)
+layout.CellSize=UDim2.new(0,100,0,80)
+layout.CellPadding=UDim2.new(0,10,0,10)
 layout.FillDirection=Enum.FillDirection.Horizontal
 layout.HorizontalAlignment=Enum.HorizontalAlignment.Center
 layout.Parent=grid
 
 local buttons={}
-local names={"FLIGHT","NOCLIP","ESP","FLING","GOD","AIM"}
-local keys={"F","X","E","G","Q","R"}
-local colors={Color3.fromRGB(0,150,255),Color3.fromRGB(0,200,100),Color3.fromRGB(255,180,0),Color3.fromRGB(255,80,80),Color3.fromRGB(200,0,255),Color3.fromRGB(255,100,0)}
+local names={"FLIGHT","NOCLIP","ESP","FLING","GOD"}
+local keys={"F","X","E","G","Q"}
+local colors={Color3.fromRGB(0,150,255),Color3.fromRGB(0,200,100),Color3.fromRGB(255,180,0),Color3.fromRGB(255,80,80),Color3.fromRGB(200,0,255)}
 
-for i=1,6 do
+for i=1,5 do
  local btn=Instance.new("Frame")
  btn.Name=names[i]
  btn.BackgroundColor3=colors[i]
@@ -98,18 +97,18 @@ for i=1,6 do
  btnUc.Parent=btn
  
  local icon=Instance.new("TextLabel")
- icon.Size=UDim2.new(1,0,0,30)
+ icon.Size=UDim2.new(1,0,0,35)
  icon.Position=UDim2.new(0,0,0,5)
  icon.BackgroundTransparency=1
  icon.Text=names[i]:sub(1,1)
  icon.TextColor3=colors[i]
- icon.TextSize=24
+ icon.TextSize=28
  icon.Font=Enum.Font.GothamBold
  icon.Parent=btn
  
  local nameLbl=Instance.new("TextLabel")
  nameLbl.Size=UDim2.new(1,0,0,20)
- nameLbl.Position=UDim2.new(0,0,0,35)
+ nameLbl.Position=UDim2.new(0,0,0,40)
  nameLbl.BackgroundTransparency=1
  nameLbl.Text=names[i]
  nameLbl.TextColor3=Color3.fromRGB(200,200,200)
@@ -119,7 +118,7 @@ for i=1,6 do
  
  local status=Instance.new("TextLabel")
  status.Size=UDim2.new(1,0,0,15)
- status.Position=UDim2.new(0,0,0,55)
+ status.Position=UDim2.new(0,0,0,60)
  status.BackgroundTransparency=1
  status.Text="OFF"
  status.TextColor3=Color3.fromRGB(150,150,150)
@@ -166,8 +165,8 @@ menuStroke.Color=Color3.fromRGB(80,80,80)
 menuStroke.Parent=menuBtn
 
 local function updateUI()
- for i=1,6 do
-  local val=i==1 and f or i==2 and n or i==3 and e or i==4 and fl or i==5 and g or a
+ for i=1,5 do
+  local val=i==1 and f or i==2 and n or i==3 and e or i==4 and fl or i==5 and g
   buttons[i][2].Text=val and"ON"or"OFF"
   buttons[i][2].TextColor3=val and Color3.fromRGB(0,255,0)or Color3.fromRGB(150,150,150)
   buttons[i][1].BackgroundTransparency=val and 0.3 or 0.8
@@ -236,11 +235,6 @@ local function toggleG()
  updateUI()
 end
 
-local function toggleA()
- a=not a
- updateUI()
-end
-
 -- ESP作成関数
 local function createESP(pl)
  if pl==p then return end
@@ -279,35 +273,6 @@ r.Stepped:Connect(function()
  if n and p.Character then
   for _,pt in pairs(p.Character:GetChildren())do
    if pt:IsA("BasePart")then pt.CanCollide=false end
-  end
- end
-end)
-
--- Aimbot
-local function getClosestPlayer()
- local cd=100
- local cp,pt
- if not p.Character or not p.Character:FindFirstChild("HumanoidRootPart")then return nil,nil end
- local mp=p.Character.HumanoidRootPart.Position
- for _,pl in pairs(ps:GetPlayers())do
-  if pl~=p and pl.Character and pl.Character:FindFirstChild("Humanoid")and pl.Character.Humanoid.Health>0 then
-   local tp=pl.Character:FindFirstChild("Head")or pl.Character:FindFirstChild("HumanoidRootPart")
-   if tp then
-    local d=(tp.Position-mp).Magnitude
-    if d<cd then cd=d cp=pl pt=tp end
-   end
-  end
- end
- return cp,pt
-end
-
--- ★★★ 修正: AimbotがONの時だけ視点移動 ★★★
-r.RenderStepped:Connect(function()
- if a and p.Character and p.Character:FindFirstChild("HumanoidRootPart")then
-  local tp,pt=getClosestPlayer()
-  if tp and pt then
-   local cf=c.CFrame
-   c.CFrame=cf:Lerp(CFrame.lookAt(cf.Position,pt.Position),0.5)
   end
  end
 end)
@@ -362,14 +327,13 @@ local function applyStats()
 end
 
 -- ボタンクリック処理
-for i=1,6 do
+for i=1,5 do
  buttons[i][3].MouseButton1Click:Connect(function()
   if i==1 then toggleF() end
   if i==2 then toggleN() end
   if i==3 then toggleE() end
   if i==4 then toggleFl() end
   if i==5 then toggleG() end
-  if i==6 then toggleA() end
  end)
 end
 
@@ -391,7 +355,6 @@ u.InputBegan:Connect(function(i,pr)
  if i.KeyCode==Enum.KeyCode.E then toggleE() end
  if i.KeyCode==Enum.KeyCode.G then toggleFl() end
  if i.KeyCode==Enum.KeyCode.Q then toggleG() end
- if i.KeyCode==Enum.KeyCode.R then toggleA() end
  if i.KeyCode==Enum.KeyCode.M then m=not m gui.Enabled=m end
  
  -- 速度調整
