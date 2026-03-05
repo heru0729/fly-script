@@ -14,7 +14,7 @@ local sb=false local grav=false local nk=false local hr=false local fr=false loc
 local pi=false local ko=false local af=false local iesp=false local skin=false local nr=false
 local ik=false local nd=false local fire=false local water=false local stun=false local tp=false
 local pos=false local timef=false local weather=false local fps=false
-local menuOpen=true
+local menuOpen=false -- 最初は閉じてる
 
 -- 設定値
 local s=50 local ws=16 local jp=50 local ds=150 local gravVal=1 local bg,bv local tpTarget=nil
@@ -45,7 +45,7 @@ main.Position=UDim2.new(0.5,-400,0.5,-300)
 main.BackgroundColor3=Color3.fromRGB(20,20,20)
 main.BackgroundTransparency=0.1
 main.BorderSizePixel=0
-main.Visible=menuOpen
+main.Visible=menuOpen  -- falseなので最初は見えない
 main.Parent=gui
 
 local corner=Instance.new("UICorner")
@@ -259,7 +259,7 @@ for i=1,28 do
  buttons[i][3].MouseButton1Click:Connect(function()
   if i==1 then toggleF()
   elseif i==2 then toggleN()
-  elseif i==3 then e=not e updateUI() createESP()
+  elseif i==3 then toggleE()
   elseif i==4 then toggleG()
   elseif i==5 then toggleW()
   elseif i==6 then toggleIJ()
@@ -289,23 +289,48 @@ for i=1,28 do
  end)
 end
 
--- キー入力
-local keyMap={
- [keys.F1]=toggleF, [keys.F2]=toggleN, [keys.F3]=function()e=not e updateUI() end,
- [keys.F4]=toggleG, [keys.F5]=toggleW, [keys.F6]=toggleIJ,
- [keys.F7]=toggleSB, [keys.F8]=toggleGrav, [keys.F9]=toggleNK,
- [keys.F10]=toggleHR, [keys.F11]=toggleFR, [keys.F12]=toggleWI,
- [keys.Num1]=togglePI, [keys.Num2]=toggleKO, [keys.Num3]=toggleAF,
- [keys.Num4]=toggleIESP, [keys.Num5]=toggleSKIN, [keys.Num6]=toggleNR,
- [keys.Num7]=toggleIK, [keys.Num8]=toggleND, [keys.Num9]=toggleFIRE,
- [keys.NumDot]=toggleWATER, [keys.NumEnter]=toggleSTUN, [keys.NumPlus]=toggleTP,
- [keys.NumMinus]=togglePOS, [keys.NumMul]=toggleTIMEF, [keys.NumDiv]=toggleWEATHER,
- [keys.Num0]=toggleFPS, [keys.M]=function()menuOpen=not menuOpen main.Visible=menuOpen end
-}
-
+-- ★★★ 修正: ここでMキーを2重に設定しない ★★★
+-- キー入力（1つにまとめる）
 u.InputBegan:Connect(function(i,pr)
  if pr then return end
- if keyMap[i.KeyCode] then keyMap[i.KeyCode]() end
+ 
+ -- メニュー開閉（最初にチェック）
+ if i.KeyCode==keys.M then
+  menuOpen=not menuOpen
+  main.Visible=menuOpen
+  return  -- 他の機能と競合しないようにreturn
+ end
+ 
+ -- 機能キー
+ if i.KeyCode==keys.F1 then toggleF()
+ elseif i.KeyCode==keys.F2 then toggleN()
+ elseif i.KeyCode==keys.F3 then toggleE()
+ elseif i.KeyCode==keys.F4 then toggleG()
+ elseif i.KeyCode==keys.F5 then toggleW()
+ elseif i.KeyCode==keys.F6 then toggleIJ()
+ elseif i.KeyCode==keys.F7 then toggleSB()
+ elseif i.KeyCode==keys.F8 then toggleGrav()
+ elseif i.KeyCode==keys.F9 then toggleNK()
+ elseif i.KeyCode==keys.F10 then toggleHR()
+ elseif i.KeyCode==keys.F11 then toggleFR()
+ elseif i.KeyCode==keys.F12 then toggleWI()
+ elseif i.KeyCode==keys.Num1 then togglePI()
+ elseif i.KeyCode==keys.Num2 then toggleKO()
+ elseif i.KeyCode==keys.Num3 then toggleAF()
+ elseif i.KeyCode==keys.Num4 then toggleIESP()
+ elseif i.KeyCode==keys.Num5 then toggleSKIN()
+ elseif i.KeyCode==keys.Num6 then toggleNR()
+ elseif i.KeyCode==keys.Num7 then toggleIK()
+ elseif i.KeyCode==keys.Num8 then toggleND()
+ elseif i.KeyCode==keys.Num9 then toggleFIRE()
+ elseif i.KeyCode==keys.NumDot then toggleWATER()
+ elseif i.KeyCode==keys.NumEnter then toggleSTUN()
+ elseif i.KeyCode==keys.NumPlus then toggleTP()
+ elseif i.KeyCode==keys.NumMinus then togglePOS()
+ elseif i.KeyCode==keys.NumMul then toggleTIMEF()
+ elseif i.KeyCode==keys.NumDiv then toggleWEATHER()
+ elseif i.KeyCode==keys.Num0 then toggleFPS()
+ end
  
  -- 速度調整
  if i.KeyCode==keys.Right then ws=math.min(ws+2,100)
@@ -343,14 +368,6 @@ end)
 closeBtn.MouseButton1Click:Connect(function()
  menuOpen=false
  main.Visible=false
-end)
-
--- Mキーで開閉
-u.InputBegan:Connect(function(i)
- if i.KeyCode==keys.M then
-  menuOpen=not menuOpen
-  main.Visible=menuOpen
- end
 end)
 
 p.CharacterAdded:Connect(function()if f then f=false if bg then bg:Destroy()end if bv then bv:Destroy()end end updateUI()end)
