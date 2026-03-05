@@ -55,7 +55,7 @@ tx3.BackgroundTransparency=1
 local tx4=Instance.new("TextLabel",frame)
 tx4.Size=UDim2.new(1,0,0.25,0)
 tx4.Position=UDim2.new(0,0,0.75,0)
-tx4.Text="Q:OFF"
+tx4.Text="G:OFF"  -- Q→Gに変更
 tx4.TextColor3=Color3.new(1,0,0)
 tx4.BackgroundTransparency=1
 
@@ -66,7 +66,7 @@ local function update()
  tx2.TextColor3=n and Color3.new(0,1,0)or Color3.new(1,0,0)
  tx3.Text=e and"E:ON"or"E:OFF"
  tx3.TextColor3=e and Color3.new(0,1,0)or Color3.new(1,0,0)
- tx4.Text=g and"Q:ON"or"Q:OFF"
+ tx4.Text=g and"G:ON"or"G:OFF"
  tx4.TextColor3=g and Color3.new(0,1,0)or Color3.new(1,0,0)
 end
 
@@ -145,7 +145,7 @@ local function toggleE()
  update()
 end
 
--- Godmode
+-- Godmode（Gキーに変更）
 local function toggleG()
  g=not g
  if g and p.Character then
@@ -204,7 +204,7 @@ u.InputBegan:Connect(function(i,pr)
  if i.KeyCode==Enum.KeyCode.F then toggleF() end
  if i.KeyCode==Enum.KeyCode.X then toggleN() end
  if i.KeyCode==Enum.KeyCode.E then toggleE() end
- if i.KeyCode==Enum.KeyCode.Q then toggleG() end
+ if i.KeyCode==Enum.KeyCode.G then toggleG() end  -- Q→Gに変更
  
  -- 速度調整（飛行中のみ）
  if f then
@@ -219,7 +219,7 @@ u.InputBegan:Connect(function(i,pr)
  elseif i.KeyCode==Enum.KeyCode.PageDown then jp=math.max(jp-5,10)applyStats()end
 end)
 
--- サーバーホップ
+-- サーバーホップ（Hキー）
 u.InputBegan:Connect(function(i,pr)
  if pr then return end
  if i.KeyCode==Enum.KeyCode.H then
@@ -237,7 +237,7 @@ u.InputBegan:Connect(function(i,pr)
  end
 end)
 
--- リジョイン
+-- リジョイン（Jキー）
 u.InputBegan:Connect(function(i,pr)
  if pr then return end
  if i.KeyCode==Enum.KeyCode.J then
