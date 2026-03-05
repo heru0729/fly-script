@@ -14,7 +14,7 @@ local e=false
 local fl=false
 local g=false
 local a=false
-local m=false -- メニュー表示
+local m=false
 
 local s=50
 local ws=16
@@ -134,7 +134,7 @@ for i=1,6 do
  btnBtn.Text=""
  btnBtn.Parent=btn
  
- table.insert(buttons,{btn,status,btnBtn})
+ table.insert(buttons,{btn,status,btnBtn,names[i]})
 end
 
 local closeBtn=Instance.new("TextButton")
@@ -175,95 +175,128 @@ local function updateUI()
  end
 end
 
-for i=1,6 do
- buttons[i][3].MouseButton1Click:Connect(function()
-  if i==1 then f=not f tF() end
-  if i==2 then n=not n tN() end
-  if i==3 then e=not e tE() end
-  if i==4 then fl=not fl tFl() end
-  if i==5 then g=not g tG() end
-  if i==6 then a=not a tA() end
-  updateUI()
- end)
-end
-
-closeBtn.MouseButton1Click:Connect(function()
- m=false
- tween:Create(gui,TweenInfo.new(0.3,Enum.EasingStyle.Back,Enum.EasingDirection.In),{Enabled=false}):Play()
-end)
-
-menuBtn.MouseButton1Click:Connect(function()
- m=not m
- gui.Enabled=m
- if m then
-  tween:Create(gui,TweenInfo.new(0.4,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Enabled=true}):Play()
- end
-end)
-
-local function tF()
- local ch=p.Character if not ch then return end
- local h=ch:FindFirstChild("Humanoid")local rt=ch:FindFirstChild("HumanoidRootPart")
+-- 各機能のトグル関数
+local function toggleF()
+ f=not f
+ local ch=p.Character
+ if not ch then return end
+ local h=ch:FindFirstChild("Humanoid")
+ local rt=ch:FindFirstChild("HumanoidRootPart")
  if not h or not rt then return end
  if f then
   h.PlatformStand=true
-  bg=Instance.new("BodyGyro")bg.MaxTorque=Vector3.new(9e9,9e9,9e9)bg.P=10000 bg.Parent=rt
-  bv=Instance.new("BodyVelocity")bv.MaxForce=Vector3.new(9e9,9e9,9e9)bv.Velocity=Vector3.new(0,0,0)bv.Parent=rt
+  bg=Instance.new("BodyGyro")
+  bg.MaxTorque=Vector3.new(9e9,9e9,9e9)
+  bg.P=10000
+  bg.Parent=rt
+  bv=Instance.new("BodyVelocity")
+  bv.MaxForce=Vector3.new(9e9,9e9,9e9)
+  bv.Velocity=Vector3.new(0,0,0)
+  bv.Parent=rt
  else
   if bg then bg:Destroy()end
   if bv then bv:Destroy()end
   h.PlatformStand=false
  end
+ updateUI()
 end
 
-local function tN() n=not n end
-local function tE()
+local function toggleN()
+ n=not n
+ updateUI()
+end
+
+local function toggleE()
  e=not e
  for _,v in pairs(ef:GetChildren())do v:Destroy()end
- if e then for _,pl in pairs(ps:GetPlayers())do cESP(pl)end end
+ if e then
+  for _,pl in pairs(ps:GetPlayers())do
+   if pl~=p then
+    createESP(pl)
+   end
+  end
+ end
+ updateUI()
 end
-local function tFl() fl=not fl end
-local function tG()
+
+local function toggleFl()
+ fl=not fl
+ updateUI()
+end
+
+local function toggleG()
  g=not g
  if g and p.Character then
   local h=p.Character:FindFirstChild("Humanoid")
-  if h then h.MaxHealth=math.huge h.Health=math.huge h.BreakJointsOnDeath=false end
+  if h then
+   h.MaxHealth=math.huge
+   h.Health=math.huge
+   h.BreakJointsOnDeath=false
+  end
  end
+ updateUI()
 end
-local function tA() a=not a end
 
-local function cESP(pl)
+local function toggleA()
+ a=not a
+ updateUI()
+end
+
+-- ESP作成関数
+local function createESP(pl)
  if pl==p then return end
- local function aESP(ch)
+ local function addESP(ch)
   if not ch then return end
-  local rt=ch:FindFirstChild("HumanoidRootPart")if not rt then return end
+  local rt=ch:FindFirstChild("HumanoidRootPart")
+  if not rt then return end
   local bx=Instance.new("BoxHandleAdornment")
-  bx.Size=Vector3.new(4,5,2)bx.Adornee=rt bx.AlwaysOnTop=true bx.ZIndex=10 bx.Transparency=0.3
+  bx.Size=Vector3.new(4,5,2)
+  bx.Adornee=rt
+  bx.AlwaysOnTop=true
+  bx.ZIndex=10
+  bx.Transparency=0.3
   bx.Color3=pl.TeamColor==p.TeamColor and Color3.new(0,1,0)or Color3.new(1,0,0)
   bx.Parent=ef
   local bl=Instance.new("BillboardGui")
-  bl.Adornee=rt bl.Size=UDim2.new(0,100,0,30)bl.StudsOffset=Vector3.new(0,3,0)bl.AlwaysOnTop=true bl.Parent=ef
+  bl.Adornee=rt
+  bl.Size=UDim2.new(0,100,0,30)
+  bl.StudsOffset=Vector3.new(0,3,0)
+  bl.AlwaysOnTop=true
+  bl.Parent=ef
   local nl=Instance.new("TextLabel")
-  nl.Size=UDim2.new(1,0,1,0)nl.BackgroundTransparency=1 nl.Text=pl.Name
-  nl.TextColor3=Color3.new(1,1,1)nl.TextStrokeTransparency=0.5 nl.Parent=bl
+  nl.Size=UDim2.new(1,0,1,0)
+  nl.BackgroundTransparency=1
+  nl.Text=pl.Name
+  nl.TextColor3=Color3.new(1,1,1)
+  nl.TextStrokeTransparency=0.5
+  nl.Parent=bl
  end
- if pl.Character then aESP(pl.Character)end
- pl.CharacterAdded:Connect(function(ch)task.wait()aESP(ch)end)
+ if pl.Character then addESP(pl.Character)end
+ pl.CharacterAdded:Connect(function(ch)task.wait()addESP(ch)end)
 end
 
+-- Noclip処理
 r.Stepped:Connect(function()
  if n and p.Character then
-  for _,pt in pairs(p.Character:GetChildren())do if pt:IsA("BasePart")then pt.CanCollide=false end end
+  for _,pt in pairs(p.Character:GetChildren())do
+   if pt:IsA("BasePart")then pt.CanCollide=false end
+  end
  end
 end)
 
-local function gCP()
- local cd=100 local cp,pt
+-- Aimbot
+local function getClosestPlayer()
+ local cd=100
+ local cp,pt
  if not p.Character or not p.Character:FindFirstChild("HumanoidRootPart")then return nil,nil end
  local mp=p.Character.HumanoidRootPart.Position
  for _,pl in pairs(ps:GetPlayers())do
   if pl~=p and pl.Character and pl.Character:FindFirstChild("Humanoid")and pl.Character.Humanoid.Health>0 then
    local tp=pl.Character:FindFirstChild("Head")or pl.Character:FindFirstChild("HumanoidRootPart")
-   if tp then local d=(tp.Position-mp).Magnitude if d<cd then cd=d cp=pl pt=tp end end
+   if tp then
+    local d=(tp.Position-mp).Magnitude
+    if d<cd then cd=d cp=pl pt=tp end
+   end
   end
  end
  return cp,pt
@@ -271,13 +304,15 @@ end
 
 r.RenderStepped:Connect(function()
  if a and p.Character and p.Character:FindFirstChild("HumanoidRootPart")then
-  local tp,pt=gCP()if tp and pt then
+  local tp,pt=getClosestPlayer()
+  if tp and pt then
    local cf=c.CFrame
    c.CFrame=cf:Lerp(CFrame.lookAt(cf.Position,pt.Position),0.5)
   end
  end
 end)
 
+-- Fling処理
 r.Heartbeat:Connect(function()
  if fl and p.Character then
   local rt=p.Character:FindFirstChild("HumanoidRootPart")
@@ -296,12 +331,16 @@ r.Heartbeat:Connect(function()
  end
 end)
 
+-- 飛行処理
 r.Heartbeat:Connect(function()
  if not f then return end
- local ch=p.Character if not ch then return end
- local rt=ch:FindFirstChild("HumanoidRootPart")if not rt or not bg or not bv then return end
+ local ch=p.Character
+ if not ch then return end
+ local rt=ch:FindFirstChild("HumanoidRootPart")
+ if not rt or not bg or not bv then return end
  bg.CFrame=CFrame.lookAt(rt.Position,rt.Position+c.CFrame.LookVector)
- local md=Vector3.new()local cs= u:IsKeyDown(Enum.KeyCode.LeftShift)and ds or s
+ local md=Vector3.new()
+ local cs= u:IsKeyDown(Enum.KeyCode.LeftShift)and ds or s
  if u:IsKeyDown(Enum.KeyCode.W)then md=md+c.CFrame.LookVector end
  if u:IsKeyDown(Enum.KeyCode.S)then md=md-c.CFrame.LookVector end
  if u:IsKeyDown(Enum.KeyCode.A)then md=md-c.CFrame.RightVector end
@@ -311,19 +350,112 @@ r.Heartbeat:Connect(function()
  bv.Velocity=md.Magnitude>0 and md.Unit*cs or Vector3.new()
 end)
 
-u.InputBegan:Connect(function(i,pr)if pr then return end
- if i.KeyCode==Enum.KeyCode.F then f=not f tF()updateUI()end
- if i.KeyCode==Enum.KeyCode.X then n=not n tN()updateUI()end
- if i.KeyCode==Enum.KeyCode.E then e=not e tE()updateUI()end
- if i.KeyCode==Enum.KeyCode.G then fl=not fl tFl()updateUI()end
- if i.KeyCode==Enum.KeyCode.Q then g=not g tG()updateUI()end
- if i.KeyCode==Enum.KeyCode.R then a=not a tA()updateUI()end
+-- 速度適用
+local function applyStats()
+ if p.Character then
+  local h=p.Character:FindFirstChild("Humanoid")
+  if h then
+   h.WalkSpeed=ws
+   if h.UseJumpPower then h.JumpPower=j else h.JumpHeight=j/3 end
+  end
+ end
+end
+
+-- ボタンクリック処理
+for i=1,6 do
+ buttons[i][3].MouseButton1Click:Connect(function()
+  if i==1 then toggleF() end
+  if i==2 then toggleN() end
+  if i==3 then toggleE() end
+  if i==4 then toggleFl() end
+  if i==5 then toggleG() end
+  if i==6 then toggleA() end
+ end)
+end
+
+closeBtn.MouseButton1Click:Connect(function()
+ m=false
+ gui.Enabled=false
+end)
+
+menuBtn.MouseButton1Click:Connect(function()
+ m=not m
+ gui.Enabled=m
+end)
+
+-- キー入力
+u.InputBegan:Connect(function(i,pr)
+ if pr then return end
+ if i.KeyCode==Enum.KeyCode.F then toggleF() end
+ if i.KeyCode==Enum.KeyCode.X then toggleN() end
+ if i.KeyCode==Enum.KeyCode.E then toggleE() end
+ if i.KeyCode==Enum.KeyCode.G then toggleFl() end
+ if i.KeyCode==Enum.KeyCode.Q then toggleG() end
+ if i.KeyCode==Enum.KeyCode.R then toggleA() end
  if i.KeyCode==Enum.KeyCode.M then m=not m gui.Enabled=m end
+ 
+ -- 速度調整
+ if f then
+  if i.KeyCode==Enum.KeyCode.Up then s=math.min(s+10,200)
+  elseif i.KeyCode==Enum.KeyCode.Down then s=math.max(s-10,10)end
+ end
+ if i.KeyCode==Enum.KeyCode.Right then ws=math.min(ws+2,100)applyStats()
+ elseif i.KeyCode==Enum.KeyCode.Left then ws=math.max(ws-2,1)applyStats()end
+ if i.KeyCode==Enum.KeyCode.PageUp then j=math.min(j+5,200)applyStats()
+ elseif i.KeyCode==Enum.KeyCode.PageDown then j=math.max(j-5,10)applyStats()end
 end)
 
 p.CharacterAdded:Connect(function()
- if f then f=false if bg then bg:Destroy()end if bv then bv:Destroy()end end
+ if f then
+  f=false
+  if bg then bg:Destroy()end
+  if bv then bv:Destroy()end
+ end
+ applyStats()
+ updateUI()
 end)
 
-ps.PlayerAdded:Connect(function(pl)if e then cESP(pl)end end)
+ps.PlayerAdded:Connect(function(pl)
+ if e then createESP(pl) end
+end)
+
+-- サーバーホップ
+local function serverHop()
+ local d=hs:JSONDecode(game:HttpGetAsync("https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?limit=100")).data
+ for _,v in pairs(d)do
+  if v.playing<v.maxPlayers and v.id~=game.JobId then
+   ts:TeleportToPlaceInstance(game.PlaceId,v.id)
+   break
+  end
+ end
+end
+
+local function rejoin()
+ if #ps:GetPlayers()<=1 then
+  ts:Teleport(game.PlaceId,p)
+ else
+  ts:TeleportToPlaceInstance(game.PlaceId,game.JobId,p)
+ end
+end
+
+u.InputBegan:Connect(function(i,pr)
+ if pr then return end
+ if i.KeyCode==Enum.KeyCode.H then serverHop()end
+ if i.KeyCode==Enum.KeyCode.J then rejoin()end
+end)
+
+-- アンチキック
+local ac=hookmetamethod
+if ac then
+ local oi=ac(game,"__index",function(s,m)
+  if s==p and m:lower()=="kick"then return error("",2)end
+  return oi(s,m)
+ end)
+ local on=ac(game,"__namecall",function(s,...)
+  if s==p and getnamecallmethod():lower()=="kick"then return end
+  return on(s,...)
+ end)
+end
+
+applyStats()
 updateUI()
